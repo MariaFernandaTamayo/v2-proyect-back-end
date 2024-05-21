@@ -42,7 +42,6 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-
 // Actualizar un tweet
 router.put("/:id", async (req, res) => {
     try {
