@@ -1,3 +1,4 @@
+//todos.js
 const router = require("express").Router();
 const Tweet = require("../schema/tweet");
 
@@ -59,6 +60,18 @@ router.put("/:id", async (req, res) => {
         res.json(updatedTweet);
     } catch (error) {
         res.status(500).json({ error: "Error al actualizar el tweet" });
+    }
+});
+// Obtener un tweet por ID (sin restricción de usuario)
+router.get("/:id", async (req, res) => {
+    try {
+        const tweet = await Tweet.findById(req.params.id);
+        if (!tweet) {
+            return res.status(404).json({ error: "Tweet no encontrado" });
+        }
+        res.json(tweet);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener el tweet" });
     }
 });
 
