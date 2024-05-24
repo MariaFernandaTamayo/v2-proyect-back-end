@@ -74,5 +74,14 @@ router.get("/:id", async (req, res) => {
         res.status(500).json({ error: "Error al obtener el tweet" });
     }
 });
+// Obtener todos los tweets del usuario actual
+router.get("/", async (req, res) => {
+    try {
+        const tweets = await Tweet.find({ idUser: req.user.id });
+        res.json(tweets);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener los tweets" });
+    }
+});
 
 module.exports = router;
