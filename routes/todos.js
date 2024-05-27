@@ -1,8 +1,7 @@
-//todos.js
 const router = require("express").Router();
 const Tweet = require("../schema/tweet");
 
-// Obtener todos los tweets
+// Obtener todos los tweets del usuario actual
 router.get("/", async (req, res) => {
     try {
         const tweets = await Tweet.find({ idUser: req.user.id });
@@ -62,25 +61,45 @@ router.put("/:id", async (req, res) => {
         res.status(500).json({ error: "Error al actualizar el tweet" });
     }
 });
-// Obtener un tweet por ID (sin restricción de usuario)
-router.get("/:id", async (req, res) => {
+
+// Obtener un tweet por ID
+router.get("/id/:id", async (req, res) => {
     try {
-        const tweet = await Tweet.findById(req.params.id);
+        const tweet = await Tweet.findById(req.params.id).populate('user', 'username');
         if (!tweet) {
             return res.status(404).json({ error: "Tweet no encontrado" });
         }
-        res.json(tweet);
+        res.json({ 
+            _id: tweet._id,
+            title: tweet.title,
+            submit: tweet.submit,
+            user: {
+                username: tweet.user.username
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: "Error al obtener el tweet" });
     }
 });
-// Obtener todos los tweets del usuario actual
-router.get("/", async (req, res) => {
+
+// Buscar tweets por título
+router.get("/search", async (req, res) => {
     try {
-        const tweets = await Tweet.find({ idUser: req.user.id });
+        const keyword = req.query.keyword;
+        const tweets = await Tweet.find({ title: { $regex: keyword, $options: "i" } });
         res.json(tweets);
     } catch (error) {
-        res.status(500).json({ error: "Error al obtener los tweets" });
+        res.status(500).json({ error: "Error al obtener los tweets por palabra clave" });
+    }
+});
+
+// Obtener todos los tweets de todos los usuarios
+router.get("/all", async (req, res) => {
+    try {
+        const tweets = await Tweet.find();
+        res.json(tweets);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener los tweets de todos los usuarios" });
     }
 });
 
